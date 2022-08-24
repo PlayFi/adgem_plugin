@@ -18,8 +18,19 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
+    AdGemListener listener = AdGemListener(
+      onOfferWallStateChanged: (status) {
+        print('onOfferWallStateChanged');
+      },
+      onOfferWallClosed: () {
+        print('onOfferWallClosed');
+      },
+      onOfferWallReward: () {
+        print('onOfferWallClosed');
+      },
+    );
     super.initState();
-    Adgem.init();
+    Adgem.init(listener: listener);
     Adgem.setPlayerId(id: '12345');
   }
 
@@ -32,7 +43,8 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                print(await Adgem.isOfferWallReady());
                 Adgem.showOfferWall();
               },
               child: const Text('Button')),
