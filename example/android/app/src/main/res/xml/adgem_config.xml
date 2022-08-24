@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adgem-configuration
+            applicationId="24384"
+            interstitialAdsEnabled="false"
+            rewardedVideoAdsEnabled="false"
+            offerWallEnabled="true"
+            lockOrientation="true"/>
