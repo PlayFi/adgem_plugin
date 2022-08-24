@@ -4,6 +4,8 @@ import android.content.Context;
 import android.app.Activity;
 
 import androidx.annotation.NonNull;
+import java.util.Map;
+import java.util.HashMap;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
@@ -14,6 +16,7 @@ import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import com.adgem.android.AdGem;
 import com.adgem.android.PlayerMetadata;
+import com.adgem.android.OfferWallCallback;
 
 /** AdgemPlugin */
 public class AdgemPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -32,6 +35,25 @@ public class AdgemPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
     return sdk;
   }
 
+  OfferWallCallback callback = new OfferWallCallback() {
+      @Override
+      public void onOfferWallStateChanged(int newState) {
+          Map<String, Integer> params = new HashMap<>( 1 );
+          params.put( "status", newState );
+          channel.invokeMethod("ON_OFFERWALL_STATUS_CHANGE", params);
+      }
+
+      @Override
+      public void onOfferWallReward(int amount) {
+        channel.invokeMethod("ON_OFFERWALL_REWARD", null);
+      }
+
+      @Override
+      public void onOfferWallClosed() {
+        channel.invokeMethod("ON_OFFERWALL_CLOSED", null);
+      }
+  };
+
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     context = flutterPluginBinding.getApplicationContext();
@@ -49,6 +71,10 @@ public class AdgemPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
       String id = call.argument("id");
       setPlayerId(id, result);
     }
+    else if(call.method.equals("isOfferWallReady")){
+      boolean ready = sdk.isOfferWallReady();
+      result.success(ready);
+    }
   }
 
   @Override
@@ -58,16 +84,19 @@ public class AdgemPlugin implements FlutterPlugin, MethodCallHandler, ActivityAw
 
   private void init(final Result result) {
     sdk = AdGem.get();
+    sdk.registerOfferWallCallback(callback);
     result.success(null);
   }
 
   private void showOfferWall(final Result result) {
     sdk.showOfferWall(getCurrentActivity());
+    result.success(null);
   }
 
   private void setPlayerId(final String playerId, final Result result) {
     PlayerMetadata player = new PlayerMetadata.Builder().id(playerId).build();
     sdk.setPlayerMetaData(player);
+    result.success(null);
   }
 
   @Override

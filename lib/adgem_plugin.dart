@@ -9,7 +9,15 @@ class Adgem {
 
   static Future<dynamic> init({AdGemListener? listener}) async {
     _listener = listener;
-    _channel.setMethodCallHandler(_listener?._handle);
+    _channel.setMethodCallHandler((MethodCall call) async {
+      if (call.method == 'ON_OFFERWALL_STATUS_CHANGE') {
+        _listener?.onOfferWallStateChanged(call.arguments['status']);
+      } else if (call.method == 'ON_OFFERWALL_CLOSED') {
+        _listener?.onOfferWallClosed();
+      } else if (call.method == 'ON_OFFERWALL_REWARD') {
+        _listener?.onOfferWallReward();
+      }
+    });
     await _channel.invokeMethod('init');
   }
 
@@ -20,22 +28,20 @@ class Adgem {
   static Future<dynamic> setPlayerId({required String id}) async {
     await _channel.invokeMethod('setPlayerId', {'id': id});
   }
+
+  static Future<bool> isOfferWallReady() async {
+    return await _channel.invokeMethod('isOfferWallReady');
+  }
 }
 
-abstract class AdGemListener {
-  Future<dynamic> _handle(MethodCall call) async {
-    if (call.method == 'ON_OFFERWALL_STATUS_CHANGE') {
-      onOfferWallStateChanged(call.arguments['status']);
-    } else if (call.method == 'ON_OFFERWALL_CLOSED') {
-      onOfferWallClosed();
-    } else if (call.method == 'ON_OFFERWALL_REWARD') {
-      onOfferWallReward();
-    }
-  }
+class AdGemListener {
+  final Function(String status) onOfferWallStateChanged;
+  final Function() onOfferWallClosed;
+  final Function() onOfferWallReward;
 
-  void onOfferWallStateChanged(status) {}
-
-  void onOfferWallClosed() {}
-
-  void onOfferWallReward() {}
+  AdGemListener({
+    required this.onOfferWallStateChanged,
+    required this.onOfferWallClosed,
+    required this.onOfferWallReward,
+  });
 }
