@@ -34,9 +34,8 @@ class _MyAppState extends State<MyApp> {
     );
     super.initState();
     Adgem.init(listener: listener);
-    Adgem.setPlayerId(id: '12345');
-    Adgem.loadOffertoro(
-        id: '1234', appId: '14580', secret: '5df5ff3c1adea9f514b0c79fc9203a5c');
+    Adgem.setPlayerId(id: '');
+    Adgem.loadOffertoro(id: '', appId: '', secret: '');
   }
 
   @override
