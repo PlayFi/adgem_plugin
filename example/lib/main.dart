@@ -18,7 +18,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    AdGemListener listener = AdGemListener(
+    OWListener listener = OWListener(
       onOfferWallStateChanged: (status) {
         print('onOfferWallStateChanged');
       },
@@ -28,10 +28,15 @@ class _MyAppState extends State<MyApp> {
       onOfferWallReward: () {
         print('onOfferWallClosed');
       },
+      adGateLoadSuccess: () {
+        Adgem.showOfferWall(network: 'adgate');
+      },
     );
     super.initState();
     Adgem.init(listener: listener);
     Adgem.setPlayerId(id: '12345');
+    Adgem.loadOffertoro(
+        id: '1234', appId: '14580', secret: '5df5ff3c1adea9f514b0c79fc9203a5c');
   }
 
   @override
@@ -42,13 +47,27 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: ElevatedButton(
-              onPressed: () async {
-                print(await Adgem.isOfferWallReady());
-                Adgem.showOfferWall();
-              },
-              child: const Text('Button')),
-        ),
+            child: Column(
+          children: [
+            ElevatedButton(
+                onPressed: () async {
+                  if (await Adgem.isOfferWallReady()) {
+                    Adgem.showOfferWall(network: 'adgem');
+                  }
+                },
+                child: const Text('AdGem')),
+            ElevatedButton(
+                onPressed: () async {
+                  Adgem.loadAdGate(id: 'abc', wallCode: 'oK2bqQ');
+                },
+                child: const Text('AdGate')),
+            ElevatedButton(
+                onPressed: () async {
+                  Adgem.showOfferWall(network: "offertoro");
+                },
+                child: const Text('Offertoro')),
+          ],
+        )),
       ),
     );
   }
