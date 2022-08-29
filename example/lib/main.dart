@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
                 child: const Text('AdGem')),
             ElevatedButton(
                 onPressed: () async {
-                  Adgem.loadAdGate(id: 'abc', wallCode: 'oK2bqQ');
+                  Adgem.loadAdGate(id: '', wallCode: '');
                 },
                 child: const Text('AdGate')),
             ElevatedButton(
